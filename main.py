@@ -15,10 +15,7 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:5173",
-]
+origins = ["http://localhost", "http://localhost:5173", "*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +26,7 @@ app.add_middleware(
 )
 
 
-model = tf.keras.models.load_model("proper.h5")
+model = tf.keras.models.load_model("mnist_cnn_model.h5")
 
 
 @app.get("/")
@@ -48,7 +45,7 @@ async def create_upload_file(file: UploadFile):
             f.write(contents)
 
         img = cv2.imread(f"images/{file.filename}")[:, :, 0]
-        img = cv2.resize(img, dsize=(28, 28), interpolation = cv2.INTER_AREA)
+        img = cv2.resize(img, dsize=(28, 28), interpolation=cv2.INTER_AREA)
         img = tf.keras.utils.normalize(img, axis=1)
         # img = np.invert(np.array([img]))
         img = np.array([img]).reshape(-1, 28, 28, 1)
